@@ -22,13 +22,9 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
@@ -38,18 +34,9 @@ import com.google.firebase.example.fireeats.model.Rating
 import com.google.firebase.example.fireeats.model.Restaurant
 import com.google.firebase.example.fireeats.util.RestaurantUtil.getPriceString
 import com.google.firebase.firestore.*
-import me.zhanghai.android.materialratingbar.MaterialRatingBar
+import kotlinx.android.synthetic.main.activity_restaurant_detail.*
 
 class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, EventListener<DocumentSnapshot>, RatingListener {
-    private var mImageView: ImageView? = null
-    private var mNameView: TextView? = null
-    private var mRatingIndicator: MaterialRatingBar? = null
-    private var mNumRatingsView: TextView? = null
-    private var mCityView: TextView? = null
-    private var mCategoryView: TextView? = null
-    private var mPriceView: TextView? = null
-    private var mEmptyView: ViewGroup? = null
-    private var mRatingsRecycler: RecyclerView? = null
     private var mRatingDialog: RatingDialogFragment? = null
     private var mFirestore: FirebaseFirestore? = null
     private var mRestaurantRef: DocumentReference? = null
@@ -59,17 +46,8 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_restaurant_detail)
-        mImageView = findViewById(R.id.restaurant_image)
-        mNameView = findViewById(R.id.restaurant_name)
-        mRatingIndicator = findViewById(R.id.restaurant_rating)
-        mNumRatingsView = findViewById(R.id.restaurant_num_ratings)
-        mCityView = findViewById(R.id.restaurant_city)
-        mCategoryView = findViewById(R.id.restaurant_category)
-        mPriceView = findViewById(R.id.restaurant_price)
-        mEmptyView = findViewById(R.id.view_empty_ratings)
-        mRatingsRecycler = findViewById(R.id.recycler_ratings)
-        findViewById<View>(R.id.restaurant_button_back).setOnClickListener(this)
-        findViewById<View>(R.id.fab_show_rating_dialog).setOnClickListener(this)
+        restaurant_button_back.setOnClickListener(this)
+        fab_show_rating_dialog.setOnClickListener(this)
         // Get restaurant ID from extras
         val restaurantId = intent.extras!!.getString(KEY_RESTAURANT_ID)
                 ?: throw IllegalArgumentException("Must pass extra $KEY_RESTAURANT_ID")
@@ -86,16 +64,16 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
         mRatingAdapter = object : RatingAdapter(ratingsQuery) {
             override fun onDataChanged() {
                 if (itemCount == 0) {
-                    mRatingsRecycler?.setVisibility(View.GONE)
-                    mEmptyView?.setVisibility(View.VISIBLE)
+                    recycler_ratings.setVisibility(View.GONE)
+                    view_empty_ratings.setVisibility(View.VISIBLE)
                 } else {
-                    mRatingsRecycler?.setVisibility(View.VISIBLE)
-                    mEmptyView?.setVisibility(View.GONE)
+                    recycler_ratings.setVisibility(View.VISIBLE)
+                    view_empty_ratings.setVisibility(View.GONE)
                 }
             }
         }
-        mRatingsRecycler?.setLayoutManager(LinearLayoutManager(this))
-        mRatingsRecycler?.setAdapter(mRatingAdapter)
+        recycler_ratings.setLayoutManager(LinearLayoutManager(this))
+        recycler_ratings.setAdapter(mRatingAdapter)
         mRatingDialog = RatingDialogFragment()
     }
 
@@ -158,16 +136,16 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
     }
 
     private fun onRestaurantLoaded(restaurant: Restaurant?) {
-        mNameView!!.text = restaurant!!.name
-        mRatingIndicator!!.rating = restaurant.avgRating.toFloat()
-        mNumRatingsView!!.text = getString(R.string.fmt_num_ratings, restaurant.numRatings)
-        mCityView!!.text = restaurant.city
-        mCategoryView!!.text = restaurant.category
-        mPriceView!!.text = getPriceString(restaurant)
+        restaurant_name.text = restaurant!!.name
+        restaurant_rating.rating = restaurant.avgRating.toFloat()
+        restaurant_num_ratings.text = getString(R.string.fmt_num_ratings, restaurant.numRatings)
+        restaurant_city.text = restaurant.city
+        restaurant_category.text = restaurant.category
+        restaurant_price.text = getPriceString(restaurant)
         // Background image
-        Glide.with(mImageView!!.context)
+        Glide.with(restaurant_image.context)
                 .load(restaurant.photo)
-                .into(mImageView)
+                .into(restaurant_image)
     }
 
     fun onBackArrowClicked(view: View?) {
@@ -184,7 +162,7 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
                     Log.d(TAG, "Rating added")
                     // Hide keyboard and scroll to top
                     hideKeyboard()
-                    mRatingsRecycler!!.smoothScrollToPosition(0)
+                    recycler_ratings.smoothScrollToPosition(0)
                 }
                 .addOnFailureListener(this) { e ->
                     Log.w(TAG, "Add rating failed", e)

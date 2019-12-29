@@ -30,6 +30,7 @@ class Filters {
     var price = -1
     var sortBy: String? = null
     var sortDirection: Query.Direction? = null
+    
     fun hasCategory(): Boolean {
         return !TextUtils.isEmpty(category)
     }

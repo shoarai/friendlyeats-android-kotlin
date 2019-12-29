@@ -26,14 +26,10 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.auth.AuthUI
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -45,13 +41,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFragment.FilterListener, OnRestaurantSelectedListener {
-    private var mToolbar: Toolbar? = null
-    private var mCurrentSearchView: TextView? = null
-    private var mCurrentSortByView: TextView? = null
-    private var mRestaurantsRecycler: RecyclerView? = null
-    private var mEmptyView: ViewGroup? = null
     private var mFirestore: FirebaseFirestore? = null
     private var mQuery: Query? = null
     private var mFilterDialog: FilterDialogFragment? = null
@@ -61,14 +53,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mToolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(mToolbar)
-        mCurrentSearchView = findViewById(R.id.text_current_search)
-        mCurrentSortByView = findViewById(R.id.text_current_sort_by)
-        mRestaurantsRecycler = findViewById(R.id.recycler_restaurants)
-        mEmptyView = findViewById(R.id.view_empty)
-        findViewById<View>(R.id.filter_bar).setOnClickListener(this)
-        findViewById<View>(R.id.button_clear_filter).setOnClickListener(this)
+        setSupportActionBar(toolbar)
+        filter_bar.setOnClickListener(this)
+        button_clear_filter.setOnClickListener(this)
         // View model
         mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
         // Enable Firestore logging
@@ -95,11 +82,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
         mAdapter = object : RestaurantAdapter(mQuery, this@MainActivity) {
             override fun onDataChanged() { // Show/hide content if the query returns empty.
                 if (itemCount == 0) {
-                    mRestaurantsRecycler!!.visibility = View.GONE
-                    mEmptyView!!.visibility = View.VISIBLE
+                    recycler_restaurants.visibility = View.GONE
+                    view_empty.visibility = View.VISIBLE
                 } else {
-                    mRestaurantsRecycler!!.visibility = View.VISIBLE
-                    mEmptyView!!.visibility = View.GONE
+                    recycler_restaurants.visibility = View.VISIBLE
+                    view_empty.visibility = View.GONE
                 }
             }
 
@@ -108,8 +95,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
                         "Error: check logs for info.", Snackbar.LENGTH_LONG).show()
             }
         }
-        mRestaurantsRecycler!!.layoutManager = LinearLayoutManager(this)
-        mRestaurantsRecycler!!.adapter = mAdapter
+        recycler_restaurants.layoutManager = LinearLayoutManager(this)
+        recycler_restaurants.adapter = mAdapter
     }
 
     public override fun onStart() {
@@ -174,8 +161,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
         mQuery = query
         mAdapter!!.setQuery(query)
         // Set header
-        mCurrentSearchView!!.text = Html.fromHtml(filters.getSearchDescription(this))
-        mCurrentSortByView!!.text = filters.getOrderDescription(this)
+        text_current_search.text = Html.fromHtml(filters.getSearchDescription(this))
+        text_current_sort_by.text = filters.getOrderDescription(this)
         // Save filters
         mViewModel!!.filters = filters
     }

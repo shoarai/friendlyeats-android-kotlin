@@ -31,7 +31,8 @@ class Rating {
     @ServerTimestamp
     var timestamp: Date? = null
 
-    constructor() {}
+    constructor()
+
     constructor(user: FirebaseUser?, rating: Double, text: String?) {
         userId = user!!.uid
         userName = user.displayName

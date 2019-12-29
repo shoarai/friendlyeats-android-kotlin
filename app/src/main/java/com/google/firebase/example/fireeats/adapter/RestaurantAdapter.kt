@@ -18,8 +18,6 @@ package com.google.firebase.example.fireeats.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.example.fireeats.R
@@ -27,7 +25,7 @@ import com.google.firebase.example.fireeats.model.Restaurant
 import com.google.firebase.example.fireeats.util.RestaurantUtil
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
-import me.zhanghai.android.materialratingbar.MaterialRatingBar
+import kotlinx.android.synthetic.main.item_restaurant.view.*
 
 /**
  * RecyclerView adapter for a list of Restaurants.
@@ -47,41 +45,22 @@ open class RestaurantAdapter(query: Query?, private val mListener: OnRestaurantS
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var imageView: ImageView
-        var nameView: TextView
-        var ratingBar: MaterialRatingBar
-        var numRatingsView: TextView
-        var priceView: TextView
-        var categoryView: TextView
-        var cityView: TextView
-        fun bind(snapshot: DocumentSnapshot,
-                 listener: OnRestaurantSelectedListener?) {
+        fun bind(snapshot: DocumentSnapshot, listener: OnRestaurantSelectedListener?) {
             val restaurant = snapshot.toObject(Restaurant::class.java)
             val resources = itemView.resources
             // Load image
-            Glide.with(imageView.context)
+            Glide.with(itemView.restaurant_item_image.context)
                     .load(restaurant!!.photo)
-                    .into(imageView)
-            nameView.text = restaurant.name
-            ratingBar.rating = restaurant.avgRating.toFloat()
-            cityView.text = restaurant.city
-            categoryView.text = restaurant.category
-            numRatingsView.text = resources.getString(R.string.fmt_num_ratings,
+                    .into(itemView.restaurant_item_image)
+            itemView.restaurant_item_name.text = restaurant.name
+            itemView.restaurant_item_rating.rating = restaurant.avgRating.toFloat()
+            itemView.restaurant_item_city.text = restaurant.city
+            itemView.restaurant_item_category.text = restaurant.category
+            itemView.restaurant_item_num_ratings.text = resources.getString(R.string.fmt_num_ratings,
                     restaurant.numRatings)
-            priceView.text = RestaurantUtil.getPriceString(restaurant)
+            itemView.restaurant_item_price.text = RestaurantUtil.getPriceString(restaurant)
             // Click listener
             itemView.setOnClickListener { listener?.onRestaurantSelected(snapshot) }
         }
-
-        init {
-            imageView = itemView.findViewById(R.id.restaurant_item_image)
-            nameView = itemView.findViewById(R.id.restaurant_item_name)
-            ratingBar = itemView.findViewById(R.id.restaurant_item_rating)
-            numRatingsView = itemView.findViewById(R.id.restaurant_item_num_ratings)
-            priceView = itemView.findViewById(R.id.restaurant_item_price)
-            categoryView = itemView.findViewById(R.id.restaurant_item_category)
-            cityView = itemView.findViewById(R.id.restaurant_item_city)
-        }
     }
-
 }

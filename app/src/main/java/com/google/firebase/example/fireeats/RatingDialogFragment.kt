@@ -20,19 +20,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.example.fireeats.model.Rating
-import me.zhanghai.android.materialratingbar.MaterialRatingBar
+import kotlinx.android.synthetic.main.dialog_rating.*
 
 /**
  * Dialog Fragment containing rating form.
  */
 class RatingDialogFragment : DialogFragment(), View.OnClickListener {
-    private var mRatingBar: MaterialRatingBar? = null
-    private var mRatingText: EditText? = null
-
     internal interface RatingListener {
         fun onRating(rating: Rating?)
     }
@@ -42,8 +38,6 @@ class RatingDialogFragment : DialogFragment(), View.OnClickListener {
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(R.layout.dialog_rating, container, false)
-        mRatingBar = v.findViewById(R.id.restaurant_form_rating)
-        mRatingText = v.findViewById(R.id.restaurant_form_text)
         v.findViewById<View>(R.id.restaurant_form_button).setOnClickListener(this)
         v.findViewById<View>(R.id.restaurant_form_cancel).setOnClickListener(this)
         return v
@@ -73,8 +67,8 @@ class RatingDialogFragment : DialogFragment(), View.OnClickListener {
     fun onSubmitClicked(view: View?) {
         val rating = Rating(
                 FirebaseAuth.getInstance().currentUser,
-                mRatingBar!!.rating.toDouble(),
-                mRatingText!!.text.toString())
+                restaurant_form_rating.rating.toDouble(),
+                restaurant_form_text.text.toString())
         if (mRatingListener != null) {
             mRatingListener!!.onRating(rating)
         }
