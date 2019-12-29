@@ -20,10 +20,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Spinner
 import androidx.fragment.app.DialogFragment
 import com.google.firebase.example.fireeats.model.Restaurant
 import com.google.firebase.firestore.Query
+import kotlinx.android.synthetic.main.dialog_filters.*
 
 /**
  * Dialog Fragment containing filter form.
@@ -33,24 +33,20 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
         fun onFilter(filters: Filters?)
     }
 
-    private var mRootView: View? = null
-    private var mCategorySpinner: Spinner? = null
-    private var mCitySpinner: Spinner? = null
-    private var mSortSpinner: Spinner? = null
-    private var mPriceSpinner: Spinner? = null
+    private lateinit var mRootView: View
     private var mFilterListener: FilterListener? = null
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.dialog_filters, container, false)
-        mCategorySpinner = mRootView?.findViewById(R.id.spinner_category)
-        mCitySpinner = mRootView?.findViewById(R.id.spinner_city)
-        mSortSpinner = mRootView?.findViewById(R.id.spinner_sort)
-        mPriceSpinner = mRootView?.findViewById(R.id.spinner_price)
-        mRootView?.findViewById<View>(R.id.button_search)?.setOnClickListener(this)
-        mRootView?.findViewById<View>(R.id.button_cancel)?.setOnClickListener(this)
         return mRootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        button_search.setOnClickListener(this)
+        button_cancel.setOnClickListener(this)
     }
 
     override fun onAttach(context: Context) {
@@ -87,7 +83,7 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
 
     private val selectedCategory: String?
         private get() {
-            val selected = mCategorySpinner!!.selectedItem as String
+            val selected = spinner_category.selectedItem as String
             return if (getString(R.string.value_any_category) == selected) {
                 null
             } else {
@@ -97,7 +93,7 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
 
     private val selectedCity: String?
         private get() {
-            val selected = mCitySpinner!!.selectedItem as String
+            val selected = spinner_city!!.selectedItem as String
             return if (getString(R.string.value_any_city) == selected) {
                 null
             } else {
@@ -107,7 +103,7 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
 
     private val selectedPrice: Int
         private get() {
-            val selected = mPriceSpinner!!.selectedItem as String
+            val selected = spinner_price!!.selectedItem as String
             return if (selected == getString(R.string.price_1)) {
                 1
             } else if (selected == getString(R.string.price_2)) {
@@ -121,21 +117,21 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
 
     private val selectedSortBy: String?
         private get() {
-            val selected = mSortSpinner!!.selectedItem as String
+            val selected = spinner_sort!!.selectedItem as String
             if (getString(R.string.sort_by_rating) == selected) {
-                return Restaurant.Companion.FIELD_AVG_RATING
+                return Restaurant.FIELD_AVG_RATING
             }
             if (getString(R.string.sort_by_price) == selected) {
-                return Restaurant.Companion.FIELD_PRICE
+                return Restaurant.FIELD_PRICE
             }
             return if (getString(R.string.sort_by_popularity) == selected) {
-                Restaurant.Companion.FIELD_POPULARITY
+                Restaurant.FIELD_POPULARITY
             } else null
         }
 
     private val sortDirection: Query.Direction?
         private get() {
-            val selected = mSortSpinner!!.selectedItem as String
+            val selected = spinner_sort!!.selectedItem as String
             if (getString(R.string.sort_by_rating) == selected) {
                 return Query.Direction.DESCENDING
             }
@@ -148,24 +144,20 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
         }
 
     fun resetFilters() {
-        if (mRootView != null) {
-            mCategorySpinner!!.setSelection(0)
-            mCitySpinner!!.setSelection(0)
-            mPriceSpinner!!.setSelection(0)
-            mSortSpinner!!.setSelection(0)
-        }
+        spinner_category.setSelection(0)
+        spinner_city!!.setSelection(0)
+        spinner_price!!.setSelection(0)
+        spinner_sort!!.setSelection(0)
     }
 
     val filters: Filters
         get() {
             val filters = Filters()
-            if (mRootView != null) {
-                filters.category = selectedCategory
-                filters.city = selectedCity
-                filters.price = selectedPrice
-                filters.sortBy = selectedSortBy
-                filters.sortDirection = sortDirection
-            }
+            filters.category = selectedCategory
+            filters.city = selectedCity
+            filters.price = selectedPrice
+            filters.sortBy = selectedSortBy
+            filters.sortDirection = sortDirection
             return filters
         }
 

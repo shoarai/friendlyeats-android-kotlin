@@ -48,6 +48,7 @@ open class RestaurantAdapter(query: Query?, private val mListener: OnRestaurantS
         fun bind(snapshot: DocumentSnapshot, listener: OnRestaurantSelectedListener?) {
             val restaurant = snapshot.toObject(Restaurant::class.java)
             val resources = itemView.resources
+            
             // Load image
             Glide.with(itemView.restaurant_item_image.context)
                     .load(restaurant!!.photo)
@@ -59,6 +60,7 @@ open class RestaurantAdapter(query: Query?, private val mListener: OnRestaurantS
             itemView.restaurant_item_num_ratings.text = resources.getString(R.string.fmt_num_ratings,
                     restaurant.numRatings)
             itemView.restaurant_item_price.text = RestaurantUtil.getPriceString(restaurant)
+
             // Click listener
             itemView.setOnClickListener { listener?.onRestaurantSelected(snapshot) }
         }

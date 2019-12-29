@@ -18,12 +18,11 @@ package com.google.firebase.example.fireeats.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.example.fireeats.R
 import com.google.firebase.example.fireeats.model.Rating
 import com.google.firebase.firestore.Query
-import me.zhanghai.android.materialratingbar.MaterialRatingBar
+import kotlinx.android.synthetic.main.item_rating.view.*
 
 /**
  * RecyclerView adapter for a bunch of Ratings.
@@ -39,19 +38,10 @@ open class RatingAdapter(query: Query?) : FirestoreAdapter<RatingAdapter.ViewHol
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var nameView: TextView
-        var ratingBar: MaterialRatingBar
-        var textView: TextView
         fun bind(rating: Rating?) {
-            nameView.text = rating!!.userName
-            ratingBar.rating = rating.rating.toFloat()
-            textView.text = rating.text
-        }
-
-        init {
-            nameView = itemView.findViewById(R.id.rating_item_name)
-            ratingBar = itemView.findViewById(R.id.rating_item_rating)
-            textView = itemView.findViewById(R.id.rating_item_text)
+            itemView.rating_item_name.text = rating!!.userName
+            itemView.rating_item_rating.rating = rating.rating.toFloat()
+            itemView.rating_item_text.text = rating.text
         }
     }
 }

@@ -30,7 +30,7 @@ class Filters {
     var price = -1
     var sortBy: String? = null
     var sortDirection: Query.Direction? = null
-    
+
     fun hasCategory(): Boolean {
         return !TextUtils.isEmpty(category)
     }
@@ -77,12 +77,16 @@ class Filters {
     }
 
     fun getOrderDescription(context: Context): String {
-        return if (Restaurant.Companion.FIELD_PRICE == sortBy) {
-            context.getString(R.string.sorted_by_price)
-        } else if (Restaurant.Companion.FIELD_POPULARITY == sortBy) {
-            context.getString(R.string.sorted_by_popularity)
-        } else {
-            context.getString(R.string.sorted_by_rating)
+        return when (sortBy) {
+            Restaurant.FIELD_PRICE -> {
+                context.getString(R.string.sorted_by_price)
+            }
+            Restaurant.FIELD_POPULARITY -> {
+                context.getString(R.string.sorted_by_popularity)
+            }
+            else -> {
+                context.getString(R.string.sorted_by_rating)
+            }
         }
     }
 
@@ -90,7 +94,7 @@ class Filters {
         val default: Filters
             get() {
                 val filters = Filters()
-                filters.sortBy = Restaurant.Companion.FIELD_AVG_RATING
+                filters.sortBy = Restaurant.FIELD_AVG_RATING
                 filters.sortDirection = Query.Direction.DESCENDING
                 return filters
             }

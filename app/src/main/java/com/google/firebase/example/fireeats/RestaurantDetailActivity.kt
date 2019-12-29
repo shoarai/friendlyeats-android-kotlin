@@ -37,11 +37,11 @@ import com.google.firebase.firestore.*
 import kotlinx.android.synthetic.main.activity_restaurant_detail.*
 
 class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, EventListener<DocumentSnapshot>, RatingListener {
-    private var mRatingDialog: RatingDialogFragment? = null
-    private var mFirestore: FirebaseFirestore? = null
-    private var mRestaurantRef: DocumentReference? = null
+    private lateinit var mRatingDialog: RatingDialogFragment
+    private lateinit var mFirestore: FirebaseFirestore
+    private lateinit var mRestaurantRef: DocumentReference
+    private lateinit var mRatingAdapter: RatingAdapter
     private var mRestaurantRegistration: ListenerRegistration? = null
-    private var mRatingAdapter: RatingAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +54,9 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
         // Initialize Firestore
         mFirestore = FirebaseFirestore.getInstance()
         // Get reference to the restaurant
-        mRestaurantRef = mFirestore!!.collection("restaurants").document(restaurantId)
+        mRestaurantRef = mFirestore.collection("restaurants").document(restaurantId)
         // Get ratings
-        val ratingsQuery = mRestaurantRef!!
+        val ratingsQuery = mRestaurantRef
                 .collection("ratings")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(50)
@@ -64,28 +64,28 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
         mRatingAdapter = object : RatingAdapter(ratingsQuery) {
             override fun onDataChanged() {
                 if (itemCount == 0) {
-                    recycler_ratings.setVisibility(View.GONE)
-                    view_empty_ratings.setVisibility(View.VISIBLE)
+                    recycler_ratings.visibility = View.GONE
+                    view_empty_ratings.visibility = View.VISIBLE
                 } else {
-                    recycler_ratings.setVisibility(View.VISIBLE)
-                    view_empty_ratings.setVisibility(View.GONE)
+                    recycler_ratings.visibility = View.VISIBLE
+                    view_empty_ratings.visibility = View.GONE
                 }
             }
         }
-        recycler_ratings.setLayoutManager(LinearLayoutManager(this))
-        recycler_ratings.setAdapter(mRatingAdapter)
+        recycler_ratings.layoutManager = LinearLayoutManager(this)
+        recycler_ratings.adapter = mRatingAdapter
         mRatingDialog = RatingDialogFragment()
     }
 
     public override fun onStart() {
         super.onStart()
-        mRatingAdapter!!.startListening()
-        mRestaurantRegistration = mRestaurantRef!!.addSnapshotListener(this)
+        mRatingAdapter.startListening()
+        mRestaurantRegistration = mRestaurantRef.addSnapshotListener(this)
     }
 
     public override fun onStop() {
         super.onStop()
-        mRatingAdapter!!.stopListening()
+        mRatingAdapter.stopListening()
         if (mRestaurantRegistration != null) {
             mRestaurantRegistration!!.remove()
             mRestaurantRegistration = null
@@ -99,12 +99,12 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
         }
     }
 
-    private fun addRating(restaurantRef: DocumentReference?,
-                          rating: Rating?): Task<Void> { // Create reference for new rating, for use inside the transaction
+    private fun addRating(restaurantRef: DocumentReference?, rating: Rating?): Task<Void> {
+        // Create reference for new rating, for use inside the transaction
         val ratingRef = restaurantRef!!.collection("ratings")
                 .document()
         // In a transaction, add the new rating and update the aggregate totals
-        return mFirestore!!.runTransaction { transaction ->
+        return mFirestore.runTransaction { transaction ->
             val restaurant = transaction[restaurantRef]
                     .toObject(Restaurant::class.java)
             // Compute new number of ratings
@@ -153,7 +153,7 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
     }
 
     fun onAddRatingClicked(view: View?) {
-        mRatingDialog!!.show(supportFragmentManager, RatingDialogFragment.TAG)
+        mRatingDialog.show(supportFragmentManager, RatingDialogFragment.TAG)
     }
 
     override fun onRating(rating: Rating?) { // In a transaction, add the new rating and update the aggregate totals
