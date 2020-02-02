@@ -57,12 +57,12 @@ object RestaurantUtil {
     fun getRandom(context: Context): Restaurant {
         val restaurant = Restaurant()
         val random = Random()
-        // Cities (first elemnt is 'Any')
+        // Cities (first element is 'Any')
         var cities = context.resources.getStringArray(R.array.cities)
-        cities = Arrays.copyOfRange(cities, 1, cities.size)
+        cities = cities.copyOfRange(1, cities.size)
         // Categories (first element is 'Any')
         var categories = context.resources.getStringArray(R.array.categories)
-        categories = Arrays.copyOfRange(categories, 1, categories.size)
+        categories = categories.copyOfRange(1, categories.size)
         val prices = intArrayOf(1, 2, 3)
         restaurant.name = getRandomName(random)
         restaurant.city = getRandomString(cities, random)
@@ -77,7 +77,8 @@ object RestaurantUtil {
     /**
      * Get a random image.
      */
-    private fun getRandomImageUrl(random: Random): String { // Integer between 1 and MAX_IMAGE_NUM (inclusive)
+    private fun getRandomImageUrl(random: Random): String {
+        // Integer between 1 and MAX_IMAGE_NUM (inclusive)
         val id = random.nextInt(MAX_IMAGE_NUM) + 1
         return String.format(Locale.getDefault(), RESTAURANT_URL_FMT, id)
     }

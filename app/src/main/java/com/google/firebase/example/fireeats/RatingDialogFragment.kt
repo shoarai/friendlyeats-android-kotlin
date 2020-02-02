@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.dialog_rating.*
  */
 class RatingDialogFragment : DialogFragment(), View.OnClickListener {
     internal interface RatingListener {
-        fun onRating(rating: Rating?)
+        fun onRating(rating: Rating)
     }
 
     private var mRatingListener: RatingListener? = null
@@ -69,9 +69,7 @@ class RatingDialogFragment : DialogFragment(), View.OnClickListener {
                 FirebaseAuth.getInstance().currentUser,
                 restaurant_form_rating.rating.toDouble(),
                 restaurant_form_text.text.toString())
-        if (mRatingListener != null) {
-            mRatingListener!!.onRating(rating)
-        }
+        mRatingListener?.onRating(rating)
         dismiss()
     }
 

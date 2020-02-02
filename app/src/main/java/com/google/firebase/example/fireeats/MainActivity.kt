@@ -77,7 +77,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
 
     private fun initRecyclerView() {
         mAdapter = object : RestaurantAdapter(mQuery, this@MainActivity) {
-            override fun onDataChanged() { // Show/hide content if the query returns empty.
+            override fun onDataChanged() {
+                // Show/hide content if the query returns empty.
                 if (itemCount == 0) {
                     recycler_restaurants.visibility = View.GONE
                     view_empty.visibility = View.VISIBLE
@@ -87,7 +88,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
                 }
             }
 
-            override fun onError(e: FirebaseFirestoreException?) { // Show a snackbar on errors
+            override fun onError(e: FirebaseFirestoreException?) {
+                // Show a snackbar on errors
                 Snackbar.make(findViewById(android.R.id.content),
                         "Error: check logs for info.", Snackbar.LENGTH_LONG).show()
             }
@@ -114,7 +116,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
         mAdapter.stopListening()
     }
 
-    private fun onAddItemsClicked() { // Get a reference to the restaurants collection
+    private fun onAddItemsClicked() {
+        // Get a reference to the restaurants collection
         val restaurants = mFirestore.collection("restaurants")
         for (i in 0..9) { // Get a random Restaurant POJO
             val restaurant = RestaurantUtil.getRandom(this)
@@ -123,9 +126,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
         }
     }
 
-    override fun onFilter(filters: Filters?) {
-        val filters = filters ?: return
-
+    override fun onFilter(filters: Filters) {
         // Construct query basic query
         var query: Query = mFirestore.collection("restaurants")
         // Category (equality filter)
@@ -202,10 +203,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, FilterDialogFrag
         onFilter(Filters.default)
     }
 
-    override fun onRestaurantSelected(restaurant: DocumentSnapshot?) {
+    override fun onRestaurantSelected(restaurant: DocumentSnapshot) {
         // Go to the details page for the selected restaurant
         val intent = Intent(this, RestaurantDetailActivity::class.java)
-        intent.putExtra(RestaurantDetailActivity.KEY_RESTAURANT_ID, restaurant!!.id)
+        intent.putExtra(RestaurantDetailActivity.KEY_RESTAURANT_ID, restaurant.id)
         startActivity(intent)
     }
 

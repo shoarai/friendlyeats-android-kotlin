@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.dialog_filters.*
  */
 class FilterDialogFragment : DialogFragment(), View.OnClickListener {
     internal interface FilterListener {
-        fun onFilter(filters: Filters?)
+        fun onFilter(filters: Filters)
     }
 
     private lateinit var mRootView: View
@@ -71,9 +71,7 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
     }
 
     fun onSearchClicked() {
-        if (mFilterListener != null) {
-            mFilterListener!!.onFilter(filters)
-        }
+        mFilterListener?.onFilter(filters)
         dismiss()
     }
 
@@ -82,7 +80,7 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
     }
 
     private val selectedCategory: String?
-        private get() {
+        get() {
             val selected = spinner_category.selectedItem as String
             return if (getString(R.string.value_any_category) == selected) {
                 null
@@ -92,7 +90,7 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
         }
 
     private val selectedCity: String?
-        private get() {
+        get() {
             val selected = spinner_city!!.selectedItem as String
             return if (getString(R.string.value_any_city) == selected) {
                 null
@@ -144,10 +142,10 @@ class FilterDialogFragment : DialogFragment(), View.OnClickListener {
         }
 
     fun resetFilters() {
-        spinner_category.setSelection(0)
-        spinner_city!!.setSelection(0)
-        spinner_price!!.setSelection(0)
-        spinner_sort!!.setSelection(0)
+        spinner_category?.setSelection(0)
+        spinner_city?.setSelection(0)
+        spinner_price?.setSelection(0)
+        spinner_sort?.setSelection(0)
     }
 
     val filters: Filters

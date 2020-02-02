@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.item_rating.view.*
 /**
  * RecyclerView adapter for a bunch of Ratings.
  */
-open class RatingAdapter(query: Query?) : FirestoreAdapter<RatingAdapter.ViewHolder?>(query) {
+open class RatingAdapter(query: Query) : FirestoreAdapter<RatingAdapter.ViewHolder?>(query) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_rating, parent, false))

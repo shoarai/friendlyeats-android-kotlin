@@ -87,7 +87,7 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
         super.onStop()
         mRatingAdapter.stopListening()
         if (mRestaurantRegistration != null) {
-            mRestaurantRegistration!!.remove()
+            mRestaurantRegistration?.remove()
             mRestaurantRegistration = null
         }
     }
@@ -99,28 +99,28 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
         }
     }
 
-    private fun addRating(restaurantRef: DocumentReference?, rating: Rating?): Task<Void> {
+    private fun addRating(restaurantRef: DocumentReference, rating: Rating): Task<Void> {
         // Create reference for new rating, for use inside the transaction
-        val ratingRef = restaurantRef!!.collection("ratings")
+        val ratingRef = restaurantRef
+                .collection("ratings")
                 .document()
+
         // In a transaction, add the new rating and update the aggregate totals
         return mFirestore.runTransaction { transaction ->
-            val restaurant = transaction[restaurantRef]
-                    .toObject(Restaurant::class.java)
-            // Compute new number of ratings
-            val newNumRatings = restaurant!!.numRatings + 1
-            // Compute new average rating
-            val oldRatingTotal = restaurant.avgRating *
-                    restaurant.numRatings
-            val newAvgRating = (oldRatingTotal + rating!!.rating) /
-                    newNumRatings
-            // Set new restaurant info
-            restaurant.numRatings = newNumRatings
-            restaurant.avgRating = newAvgRating
-            // Commit to Firestore
-            transaction[restaurantRef] = restaurant
-            transaction[ratingRef] = rating
-            null
+            transaction[restaurantRef].toObject(Restaurant::class.java)?.let { restaurant ->
+                // Compute new number of ratings
+                val newNumRatings = restaurant.numRatings + 1
+                // Compute new average rating
+                val oldRatingTotal = restaurant.avgRating * restaurant.numRatings
+                val newAvgRating = (oldRatingTotal + rating.rating) / newNumRatings
+                // Set new restaurant info
+                restaurant.numRatings = newNumRatings
+                restaurant.avgRating = newAvgRating
+                // Commit to Firestore
+                transaction[restaurantRef] = restaurant
+                transaction[ratingRef] = rating
+                null
+            }
         }
     }
 
@@ -128,8 +128,8 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
      * Listener for the Restaurant document ([.mRestaurantRef]).
      */
     override fun onEvent(snapshot: DocumentSnapshot?, e: FirebaseFirestoreException?) {
-        if (e != null) {
-            Log.w(TAG, "restaurant:onEvent", e)
+        e?.let {
+            Log.w(TAG, "restaurant:onEvent", it)
             return
         }
         onRestaurantLoaded(snapshot!!.toObject(Restaurant::class.java))
@@ -156,7 +156,8 @@ class RestaurantDetailActivity : AppCompatActivity(), View.OnClickListener, Even
         mRatingDialog.show(supportFragmentManager, RatingDialogFragment.TAG)
     }
 
-    override fun onRating(rating: Rating?) { // In a transaction, add the new rating and update the aggregate totals
+    override fun onRating(rating: Rating) {
+        // In a transaction, add the new rating and update the aggregate totals
         addRating(mRestaurantRef, rating)
                 .addOnSuccessListener(this) {
                     Log.d(TAG, "Rating added")

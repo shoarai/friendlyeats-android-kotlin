@@ -23,24 +23,16 @@ import java.util.*
 /**
  * Model POJO for a rating.
  */
-class Rating {
-    var userId: String? = null
-    var userName: String? = null
-    var rating = 0.0
-    var text: String? = null
+class Rating(user: FirebaseUser?, var rating: Double, var text: String) {
+    var userId: String = user!!.uid
+    var userName: String?
     @ServerTimestamp
     var timestamp: Date? = null
 
-    constructor()
-
-    constructor(user: FirebaseUser?, rating: Double, text: String?) {
-        userId = user!!.uid
-        userName = user.displayName
+    init {
+        userName = user!!.displayName
         if (TextUtils.isEmpty(userName)) {
             userName = user.email
         }
-        this.rating = rating
-        this.text = text
     }
-
 }

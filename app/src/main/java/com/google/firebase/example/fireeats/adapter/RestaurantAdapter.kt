@@ -30,9 +30,10 @@ import kotlinx.android.synthetic.main.item_restaurant.view.*
 /**
  * RecyclerView adapter for a list of Restaurants.
  */
-open class RestaurantAdapter(query: Query?, private val mListener: OnRestaurantSelectedListener) : FirestoreAdapter<RestaurantAdapter.ViewHolder?>(query) {
+open class RestaurantAdapter(query: Query, private val mListener: OnRestaurantSelectedListener) :
+        FirestoreAdapter<RestaurantAdapter.ViewHolder?>(query) {
     interface OnRestaurantSelectedListener {
-        fun onRestaurantSelected(restaurant: DocumentSnapshot?)
+        fun onRestaurantSelected(restaurant: DocumentSnapshot)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -46,23 +47,24 @@ open class RestaurantAdapter(query: Query?, private val mListener: OnRestaurantS
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(snapshot: DocumentSnapshot, listener: OnRestaurantSelectedListener?) {
-            val restaurant = snapshot.toObject(Restaurant::class.java)
-            val resources = itemView.resources
-            
-            // Load image
-            Glide.with(itemView.restaurant_item_image.context)
-                    .load(restaurant!!.photo)
-                    .into(itemView.restaurant_item_image)
-            itemView.restaurant_item_name.text = restaurant.name
-            itemView.restaurant_item_rating.rating = restaurant.avgRating.toFloat()
-            itemView.restaurant_item_city.text = restaurant.city
-            itemView.restaurant_item_category.text = restaurant.category
-            itemView.restaurant_item_num_ratings.text = resources.getString(R.string.fmt_num_ratings,
-                    restaurant.numRatings)
-            itemView.restaurant_item_price.text = RestaurantUtil.getPriceString(restaurant)
+            snapshot.toObject(Restaurant::class.java)?.let { restaurant ->
+                val resources = itemView.resources
 
-            // Click listener
-            itemView.setOnClickListener { listener?.onRestaurantSelected(snapshot) }
+                // Load image
+                Glide.with(itemView.restaurant_item_image.context)
+                        .load(restaurant.photo)
+                        .into(itemView.restaurant_item_image)
+                itemView.restaurant_item_name.text = restaurant.name
+                itemView.restaurant_item_rating.rating = restaurant.avgRating.toFloat()
+                itemView.restaurant_item_city.text = restaurant.city
+                itemView.restaurant_item_category.text = restaurant.category
+                itemView.restaurant_item_num_ratings.text = resources.getString(
+                        R.string.fmt_num_ratings, restaurant.numRatings)
+                itemView.restaurant_item_price.text = RestaurantUtil.getPriceString(restaurant)
+
+                // Click listener
+                itemView.setOnClickListener { listener?.onRestaurantSelected(snapshot) }
+            }
         }
     }
 }

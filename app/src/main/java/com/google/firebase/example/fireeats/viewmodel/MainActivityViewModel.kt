@@ -23,9 +23,5 @@ import com.google.firebase.example.fireeats.Filters
  */
 class MainActivityViewModel : ViewModel() {
     var isSigningIn = false
-    var filters: Filters
-
-    init {
-        filters = Filters.default
-    }
+    var filters: Filters = Filters.default
 }

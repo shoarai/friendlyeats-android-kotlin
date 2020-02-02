@@ -18,6 +18,7 @@
  */
 package com.google.firebase.example.fireeats.adapter
 
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
@@ -35,27 +36,28 @@ import java.util.*
  * See the adapter classes in FirebaseUI (https://github.com/firebase/FirebaseUI-Android/tree/master/firestore) for a
  * more efficient implementation of a Firestore RecyclerView Adapter.
  */
-abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder?>(private var mQuery: Query?)
+abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder?>(private var mQuery: Query)
     : RecyclerView.Adapter<VH>(), EventListener<QuerySnapshot> {
     private var mRegistration: ListenerRegistration? = null
     private val mSnapshots = ArrayList<DocumentSnapshot>()
 
     fun startListening() {
-        if (mQuery != null && mRegistration == null) {
-            mRegistration = mQuery!!.addSnapshotListener(this)
+        if (mRegistration == null) {
+            mRegistration = mQuery.addSnapshotListener(this)
         }
     }
 
     fun stopListening() {
         if (mRegistration != null) {
-            mRegistration!!.remove()
+            mRegistration?.remove()
             mRegistration = null
         }
         mSnapshots.clear()
         notifyDataSetChanged()
     }
 
-    fun setQuery(query: Query?) { // Stop listening
+    fun setQuery(query: Query) {
+        // Stop listening
         stopListening()
         // Clear existing data
         mSnapshots.clear()
@@ -76,7 +78,11 @@ abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder?>(private var mQuer
     protected open fun onError(e: FirebaseFirestoreException?) {}
 
     override fun onEvent(documentSnapshots: QuerySnapshot?, e: FirebaseFirestoreException?) {
-        // ...
+        // Handle errors
+        if (e != null) {
+            Log.w(TAG, "onEvent:error", e)
+            return
+        }
 
         // Dispatch the event
         if (documentSnapshots != null) {
